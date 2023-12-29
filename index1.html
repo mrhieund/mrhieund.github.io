@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+<!--     <link rel="icon" href="favicon.ico"> -->
+
+    <title>Nguyen Duc Hieu</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="stylesheets/bootstrap.min.css" type="text/css" rel="stylesheet">
+    <link href="stylesheets/main.css" type="text/css" rel="stylesheet">
+  </head>
+
+  <body>
+    <div id="main"></div>
+    <div class="loader hidden">
+      <svg viewBox="0 0 32 32" width="32" height="32">
+        <circle id="spinner" cx="16" cy="16" r="14" fill="none"></circle>
+      </svg>
+    </div>
+    <script id="profile-template" type="javascript/html">
+      <div class="col-xs-12">
+          <span class="h5">{{full_name}}</span>
+          <a href="#experience">Experience</a>
+          <a href="#education">Education</a>
+          <a href="#skills">Skills</a>
+          <a href="#expertise">Expertise</a>
+          <a href="#contact">Contact</a>
+      </div>
+      <div class="col-xs-12">
+        <div class="col-xs-2">
+        </div>
+        <div class="col-xs-8 avatar">
+          <div class="col-xs-6 avatar">
+            <img src="{{avatar}}"></img>
+          </div>
+          <div class="col-xs-6 avatar">
+            <div><h1>{{full_name}}</h1></div>
+            <div><span class="h5">{{job_title}}</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-xs-12">
+        <div class="col-xs-2">
+        </div>
+        <div class="social__bg box col-xs-8">
+          <a class="social__logo" href="{{github}}">
+            <svg aria-hidden="true" class="octicon" height="24" version="1.1" viewBox="0 0 16 16" width="24"><path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"></path></svg>
+          </a>
+          <a class="social__logo" href="{{linkedin}}"><img src="images/linkedin.png"></img></a>
+        </div>
+        <div class="col-xs-2">
+        </div>
+      </div>
+      <div class="col-xs-12">
+        <div class="col-xs-2"></div>
+        <div class="col-xs-8">
+          <span class="h5">Hello! I'm {{first_name}}</span>
+          <p class="about">
+            I'm from {{hometown}} and now in {{location}}.
+            I'm interested in lot of things {{interests}}.
+            Currently I'm working at {{company}}.
+            I'm focusing on deliver {{goals}}.
+          </p>
+        </div>
+      </div>
+      <div id="experience" class="col-xs-12 box h5">
+        <span>Experience</span>
+      </div>
+      <div class="col-xs-12 box">
+        <div class="col-xs-6 h6 box">{{experience_year}}</div>
+        <div class="col-xs-6">{{experience_exp}}</div>
+      </div>
+      <div id="education" class="col-xs-12 box h5">
+        <span>Education</span>
+      </div>
+      <div class="col-xs-12 box">
+        <div class="col-xs-6 h6">
+          <div class="box">2008 - 2012</div>
+          <div class="box">Barchelor's Degree</div>
+        </div>
+        <div class="col-xs-6">
+          <p>NANYANG TECHNOLOGICAL UNIVERSITY</p>
+          <p>High Performance Computing and Intelligent System</p>
+        </div>
+      </div>
+      <div id="skills" class="col-xs-12 box h5">
+        <span>Skills</span>
+      </div>
+      <div class="col-xs-12 box">
+        <div class="col-xs-2"></div>
+        <div class="col-xs-8">{{skills}}</div>
+      </div>
+      <div id="contact" class="col-xs-12 box h5">
+        <span>Contact</span>
+      </div>
+    </script>
+    <script src="javascripts/app.js" async></script>
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+      ga('create', 'UA-58442258-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+  </body>
+</html>
