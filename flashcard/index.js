@@ -218,7 +218,13 @@ const App = {
     btn.disabled = false;
     Utils.setVal('bulk-text', '');
   },
-
+  shuffle: (words) => {
+    for (let i = words.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1))
+      ;[words[i], words[j]] = [words[j], words[i]]
+    }
+    return words;
+  },
   /* --- LIST & EDIT --- */
   renderList: () => {
     const query = Utils.val('search-input').toLowerCase();
@@ -232,12 +238,14 @@ const App = {
       c.vietnamese.toLowerCase().includes(query)
     );
 
-    if (filtered.length === 0) {
+    const shuffleFiltered = shuffle(filtered);
+
+    if (shuffleFiltered.length === 0) {
       container.innerHTML = '<p style="text-align:center; color:#999">No cards found.</p>';
       return;
     }
 
-    filtered.forEach(c => {
+    shuffleFiltered.forEach(c => {
       const div = document.createElement('div');
       div.className = 'card-item';
       div.innerHTML = `
@@ -292,3 +300,4 @@ const App = {
 };
 
 window.onload = App.init;
+
