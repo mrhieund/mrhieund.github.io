@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Chinese Flashcards</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#3b82f6">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div id="edit-modal" class="hidden">
+    <div class="modal-content">
+      <h3>Edit Card</h3>
+      <form onsubmit="App.saveEdit(event)">
+        <input type="hidden" id="edit-id">
+        <div class="input-group">
+          <label>Hanzi</label>
+          <input type="text" id="edit-hanzi" required>
+        </div>
+        <div class="input-group">
+          <label>Pinyin</label>
+          <input type="text" id="edit-pinyin" required>
+        </div>
+        <div class="input-group">
+          <label>Vietnamese</label>
+          <input type="text" id="edit-viet" required>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-block btn-secondary" onclick="App.closeModal()">Cancel</button>
+          <button type="submit" class="btn-block btn-primary">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <main>
+    <div id="view-review" class="hidden">
+      <div id="status-msg"></div>
+      <div id="review-ui" class="hidden">
+        <div id="card-container">
+          <div id="front">
+            <div class="hanzi" id="d-hanzi"></div>
+            <button class="btn-audio" onclick="App.playAudio()">🔊 Listen</button>
+          </div>
+          <div id="back" class="hidden">
+            <div class="pinyin" id="d-pinyin"></div>
+            <div class="definition" id="d-viet"></div>
+          </div>
+        </div>
+        <button id="btn-reveal" class="btn-block btn-primary" onclick="App.reveal()">Show Answer</button>
+        <div id="grade-options" class="grade-grid hidden">
+          <button class="grade-btn g-0" onclick="App.grade(0)">Again</button>
+          <button class="grade-btn g-3" onclick="App.grade(3)">Hard</button>
+          <button class="grade-btn g-4" onclick="App.grade(4)">Good</button>
+          <button class="grade-btn g-5" onclick="App.grade(5)">Easy</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="view-add" class="hidden">
+      <h2>Add New Card</h2>
+      <div class="section-box">
+        <form onsubmit="App.addCard(event)">
+          <div class="input-group">
+            <label>Hanzi</label>
+            <div class="search-input-wrapper">
+              <input type="text" id="in-hanzi" required placeholder="e.g. 电脑">
+              <button type="button" class="btn-icon" onclick="App.autoFill()">🔍</button>
+            </div>
+            <small style="color:#9ca3af; font-size:0.75rem; margin-top:4px;">Click 🔍 to auto-translate</small>
+          </div>
+          <div class="input-group"><label>Pinyin</label><input type="text" id="in-pinyin" required></div>
+          <div class="input-group"><label>Vietnamese</label><input type="text" id="in-viet" required></div>
+          <button type="submit" class="btn-block btn-primary">Save Card</button>
+        </form>
+      </div>
+      <div class="section-box">
+        <h3>Smart Import</h3>
+        <textarea id="bulk-text" rows="3" placeholder="List of Hanzi..."></textarea>
+        <div id="progress-container"><div id="progress-bar"></div></div>
+        <p id="bulk-status"></p>
+        <button onclick="App.bulkImport()" id="btn-bulk" class="btn-block btn-secondary">Start Import</button>
+      </div>
+    </div>
+
+    <div id="view-list" class="hidden" style="width:100%">
+      <h2>All Cards</h2>
+      <div class="search-bar-container">
+        <input type="text" id="search-input" placeholder="Search Hanzi, Pinyin, or Meaning..." onkeyup="App.renderList()">
+      </div>
+      <div id="card-list-container">
+        </div>
+    </div>
+
+    <div id="view-settings" class="hidden">
+      <h2>Dashboard</h2>
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-num" id="stat-total">0</div>
+          <div class="stat-label">Total Cards</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="stat-due" style="color:var(--danger)">0</div>
+          <div class="stat-label">Due Now</div>
+        </div>
+      </div>
+      <div class="section-box">
+        <h3>Data Management</h3>
+        <button onclick="DataMgr.export()" class="btn-block btn-success" style="margin-bottom:10px;">⬇️ Download Backup</button>
+        <div class="file-upload-wrapper">
+          <button class="btn-block btn-secondary">⬆️ Restore Backup</button>
+          <input type="file" class="file-upload-input" onchange="DataMgr.import(this)">
+        </div>
+      </div>
+      <div class="section-box" style="border: 1px solid #fee2e2;">
+        <h3 style="color:var(--danger)">Danger Zone</h3>
+        <button onclick="DataMgr.clear()" class="btn-block btn-danger">🗑️ Delete All Data</button>
+      </div>
+    </div>
+  </main>
+
+  <nav>
+    <button id="nav-review" onclick="App.setView('review')"><span>📝</span>Review</button>
+    <button id="nav-list" onclick="App.setView('list')"><span>📚</span>Cards</button>
+    <button id="nav-add" onclick="App.setView('add')"><span>➕</span>Add</button>
+    <button id="nav-settings" onclick="App.setView('settings')"><span>⚙️</span>Settings</button>
+  </nav>
+
+  <script src="index.js"></script>
+</body>
+</html>
