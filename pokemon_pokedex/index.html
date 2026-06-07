@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>National Pokédex</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <h1>National Pokédex</h1>
+        <p>Dynamic JSON Database</p>
+    </header>
+    
+    <main class="grid-container" id="pokedex-grid">
+        </main>
+
+    <div id="statModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <div class="modal-header">
+                <img id="modal-img" src="" alt="Pokemon">
+                <div>
+                    <h2 id="modal-name">Name</h2>
+                    <p class="text-muted" id="modal-id">#0000</p>
+                </div>
+            </div>
+            <div class="stats-container">
+                <div class="stat-row"><span>HP</span><div class="bar-bg"><div id="bar-hp" class="bar hp"></div></div><span id="val-hp" class="val">0</span></div>
+                <div class="stat-row"><span>Attack</span><div class="bar-bg"><div id="bar-atk" class="bar atk"></div></div><span id="val-atk" class="val">0</span></div>
+                <div class="stat-row"><span>Defense</span><div class="bar-bg"><div id="bar-def" class="bar def"></div></div><span id="val-def" class="val">0</span></div>
+                <div class="stat-row"><span>Sp. Atk</span><div class="bar-bg"><div id="bar-spa" class="bar spa"></div></div><span id="val-spa" class="val">0</span></div>
+                <div class="stat-row"><span>Sp. Def</span><div class="bar-bg"><div id="bar-spd" class="bar spd"></div></div><span id="val-spd" class="val">0</span></div>
+                <div class="stat-row"><span>Speed</span><div class="bar-bg"><div id="bar-spe" class="bar spe"></div></div><span id="val-spe" class="val">0</span></div>
+                <div class="stat-row total-row"><span>Total</span><span></span><span id="val-total" class="val bold">0</span></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Fetch JSON data and build the DOM
+        document.addEventListener("DOMContentLoaded", async () => {
+            const grid = document.getElementById('pokedex-grid');
+            try {
+                const response = await fetch('data.json');
+                if (!response.ok) throw new Error("Network response was not ok");
+                
+                const pokemonList = await response.json();
+                
+                pokemonList.forEach(p => {
+                    const typesHtml = p.types.map(t => `<span>${t}</span>`).join('');
+                    const stats = p.stats || {};
+                    
+                    // Fallback for missing stats
+                    const hp = stats.hp || 0;
+                    const atk = stats.atk || 0;
+                    const def = stats.def || 0;
+                    const spa = stats.spa || 0;
+                    const spd = stats.spd || 0;
+                    const spe = stats.spe || 0;
+                    const total = stats.total || 0;
+                    
+                    const safeName = p.name.replace(/'/g, "\'");
+
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    card.onclick = () => openModal(safeName, p.id, p.local_img, hp, atk, def, spa, spd, spe, total);
+
+                    card.innerHTML = `
+                        <img src="${p.local_img}" alt="${p.name}" loading="lazy">
+                        <div class="id">#${p.id}</div>
+                        <div class="name">${p.name}</div>
+                        <div class="types">${typesHtml}</div>
+                    `;
+                    
+                    grid.appendChild(card);
+                });
+            } catch (error) {
+                console.error("Failed to load JSON:", error);
+                grid.innerHTML = `<p style="text-align:center; grid-column: 1 / -1; color: red;">
+                    Error loading <b>data.json</b>. 
+                    <br><br>If you are opening this locally (file://), browsers block JSON fetching due to CORS. 
+                    <br>Please run <code>python -m http.server</code> in this folder and go to <b>http://localhost:8000</b>
+                </p>`;
+            }
+        });
+
+        // Modal Logic
+        function openModal(name, id, imgSrc, hp, atk, def, spa, spd, spe, total) {
+            document.getElementById('modal-name').innerText = name;
+            document.getElementById('modal-id').innerText = '#' + id;
+            document.getElementById('modal-img').src = imgSrc;
+            
+            const stats = { hp, atk, def, spa, spd, spe };
+            for (let stat in stats) {
+                document.getElementById('val-' + stat).innerText = stats[stat];
+                let pct = Math.min((stats[stat] / 255) * 100, 100);
+                document.getElementById('bar-' + stat).style.width = pct + '%';
+            }
+            document.getElementById('val-total').innerText = total;
+            
+            document.getElementById('statModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('statModal').style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            let modal = document.getElementById('statModal');
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+</html>
