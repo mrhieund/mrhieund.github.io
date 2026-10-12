@@ -23,8 +23,8 @@ const Utils = {
 
   createCard: (hanzi, pinyin, vietnamese, hsk = null) => {
     // If HSK level not explicitly passed, attempt to detect from dictionary
-    const detectedHsk = hsk !== null && hsk !== undefined && hsk !== '' 
-      ? parseInt(hsk, 10) 
+    const detectedHsk = hsk !== null && hsk !== undefined && hsk !== ''
+      ? parseInt(hsk, 10)
       : HSKManager.getLevel(hanzi);
 
     return {
@@ -585,36 +585,13 @@ const HSKManager = {
       HSKManager.updateStatus(`Downloading HSK Level ${lvl}/6...`, 'pulsing');
       try {
         let res = null;
-        // 1. Try local or service-worker-cached file (e.g. ./1.min.json)
         try {
-          const localRes = await fetch(`./${lvl}.min.json`);
-          if (localRes && localRes.ok) res = localRes;
-        } catch (e) {}
-
-        // 2. Try CDN if not found locally
-        if (!res) {
-          try {
-            const cdnRes = await fetch(`${cdnBase}${lvl}.min.json`);
-            if (cdnRes && cdnRes.ok) res = cdnRes;
-          } catch (e) {}
-        }
-
-        // 3. Try GitHub raw as fallback
-        if (!res) {
-          try {
-            const rawRes = await fetch(`${rawBase}${lvl}.min.json`);
-            if (rawRes && rawRes.ok) res = rawRes;
-          } catch (e) {}
+          res = await fetch(`${cdnBase}${lvl}.min.json`);
+        } catch (e) {
+          res = await fetch(`${rawBase}${lvl}.min.json`);
         }
 
         if (res && res.ok) {
-          // Put into Cache Storage for offline use under ./lvl.min.json
-          if ('caches' in window) {
-            try {
-              const cache = await caches.open('chinese-srs-v3');
-              cache.put(`./${lvl}.min.json`, res.clone());
-            } catch (ce) {}
-          }
           const list = await res.json();
           if (Array.isArray(list)) {
             list.forEach(item => {
@@ -669,7 +646,7 @@ const HSKManager = {
         const tx = db.transaction('hsk_data', 'readwrite');
         tx.objectStore('hsk_data').clear();
       }
-    } catch (e) {}
+    } catch (e) { }
     Utils.showToast('Cache cleared. Re-fetching HSK vocabulary...');
     await HSKManager.downloadAllLevels();
   },
@@ -792,7 +769,7 @@ const BulkImportApp = {
     BulkImportApp.renderList();
 
     Utils.showToast(`✨ Extracted ${BulkImportApp.extractedWords.length} unique Chinese words arranged by HSK level!`);
-    
+
     // Smooth scroll down to results
     const results = Utils.id('bulk-results-section');
     if (results) results.scrollIntoView({ behavior: 'smooth' });
