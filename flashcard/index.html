@@ -10,6 +10,10 @@
 </head>
 <body>
 
+  <!-- Toast Notification -->
+  <div id="toast" class="toast hidden"></div>
+
+  <!-- Edit Modal -->
   <div id="edit-modal" class="hidden">
     <div class="modal-content">
       <h3>Edit Card</h3>
@@ -27,6 +31,18 @@
           <label>Vietnamese</label>
           <input type="text" id="edit-viet" required>
         </div>
+        <div class="input-group">
+          <label>HSK Level</label>
+          <select id="edit-hsk">
+            <option value="">Auto / None</option>
+            <option value="1">HSK 1</option>
+            <option value="2">HSK 2</option>
+            <option value="3">HSK 3</option>
+            <option value="4">HSK 4</option>
+            <option value="5">HSK 5</option>
+            <option value="6">HSK 6</option>
+          </select>
+        </div>
         <div class="modal-actions">
           <button type="button" class="btn-block btn-secondary" onclick="App.closeModal()">Cancel</button>
           <button type="submit" class="btn-block btn-primary">Save Changes</button>
@@ -36,11 +52,13 @@
   </div>
 
   <main>
+    <!-- 1. Review View -->
     <div id="view-review" class="hidden">
       <div id="status-msg"></div>
       <div id="review-ui" class="hidden">
         <div id="card-container">
           <div id="front">
+            <div id="d-hsk-badge" class="badge-hsk badge-hsk-review hidden"></div>
             <div class="hanzi" id="d-hanzi"></div>
             <button class="btn-audio" onclick="App.playAudio()">🔊 Listen</button>
           </div>
@@ -59,9 +77,21 @@
       </div>
     </div>
 
+    <!-- 2. Add View (Single + Smart Bulk Import) -->
     <div id="view-add" class="hidden">
-      <h2>Add New Card</h2>
-      <div class="section-box">
+      <!-- Sub Navigation Tabs -->
+      <div class="sub-nav-tabs">
+        <button id="tab-btn-bulk" class="sub-tab-btn active" onclick="App.setAddTab('bulk')">
+          <span>⚡</span> Bulk Text Import
+        </button>
+        <button id="tab-btn-single" class="sub-tab-btn" onclick="App.setAddTab('single')">
+          <span>➕</span> Single Card
+        </button>
+      </div>
+
+      <!-- Tab: Single Card Form -->
+      <div id="add-panel-single" class="hidden section-box">
+        <h2>Add Single Card</h2>
         <form onsubmit="App.addCard(event)">
           <div class="input-group">
             <label>Hanzi</label>
@@ -76,24 +106,126 @@
           <button type="submit" class="btn-block btn-primary">Save Card</button>
         </form>
       </div>
-      <div class="section-box">
-        <h3>Smart Import</h3>
-        <textarea id="bulk-text" rows="3" placeholder="List of Hanzi..."></textarea>
-        <div id="progress-container"><div id="progress-bar"></div></div>
-        <p id="bulk-status"></p>
-        <button onclick="App.bulkImport()" id="btn-bulk" class="btn-block btn-secondary">Start Import</button>
+
+      <!-- Tab: Bulk Text Import & HSK Arranger -->
+      <div id="add-panel-bulk" class="section-box bulk-box">
+        <div class="bulk-header">
+          <h2>Bulk Import & HSK Filter</h2>
+          <p class="bulk-subtitle">Paste a wall of Chinese text. We extract individual Chinese words, categorize them by HSK level, and add them directly to your flashcards.</p>
+          
+          <!-- HSK DB Status Bar -->
+          <div class="hsk-db-status" id="hsk-db-status">
+            <span class="status-dot pulsing" id="hsk-status-dot"></span>
+            <span id="hsk-status-text">Loading HSK Dictionary...</span>
+            <button type="button" class="btn-inline-sync" onclick="HSKManager.syncRemote()" title="Reload/Download HSK data">🔄 Sync</button>
+          </div>
+        </div>
+
+        <!-- Textarea input area -->
+        <div class="bulk-input-area">
+          <textarea id="bulk-text" rows="5" placeholder="Paste your wall of Chinese text here (articles, dialogue, news, transcript)...
+e.g. 今天天气很好，我和朋友一起去超市买水果。虽然有点累，但是我们都很开心。"></textarea>
+          
+          <div class="bulk-quick-actions">
+            <button type="button" class="btn-text-link" onclick="BulkImportApp.loadSampleText()">📋 Load Sample Text</button>
+            <button type="button" class="btn-text-link" onclick="BulkImportApp.clearInput()">🗑️ Clear</button>
+          </div>
+
+          <!-- Options -->
+          <div class="bulk-options-row">
+            <label class="checkbox-label">
+              <input type="checkbox" id="opt-skip-existing" checked>
+              <span>Skip words already in deck</span>
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" id="opt-filter-stops">
+              <span>Exclude common particles (的, 了, 是, 在...)</span>
+            </label>
+          </div>
+
+          <button onclick="BulkImportApp.extractWords()" id="btn-bulk-extract" class="btn-block btn-primary btn-extract">
+            ⚡ Extract & Arrange by HSK Level
+          </button>
+        </div>
+
+        <!-- Results section (shown after extraction) -->
+        <div id="bulk-results-section" class="bulk-results-section hidden">
+          <!-- Summary statistics bar -->
+          <div class="bulk-summary-bar">
+            <div class="summary-stat">
+              <span class="summary-val" id="sum-total-words">0</span>
+              <span class="summary-lbl">Unique Words</span>
+            </div>
+            <div class="summary-stat">
+              <span class="summary-val" id="sum-new-words">0</span>
+              <span class="summary-lbl">New to Deck</span>
+            </div>
+            <div class="summary-stat">
+              <span class="summary-val" id="sum-selected-words">0</span>
+              <span class="summary-lbl">Selected</span>
+            </div>
+          </div>
+
+          <!-- HSK Level Filter Pills -->
+          <div class="level-pills-bar" id="level-pills-bar">
+            <!-- Dynamically populated level filter buttons -->
+          </div>
+
+          <!-- Toolbar for Sort & Selection -->
+          <div class="results-toolbar">
+            <div class="tool-group select-tools">
+              <button type="button" class="btn-sm" onclick="BulkImportApp.selectAll(true)">Select All</button>
+              <button type="button" class="btn-sm" onclick="BulkImportApp.selectNewOnly()">Select New Only</button>
+              <button type="button" class="btn-sm" onclick="BulkImportApp.selectAll(false)">Clear</button>
+            </div>
+            <div class="tool-group sort-tools">
+              <label for="sort-extracted">Sort:</label>
+              <select id="sort-extracted" onchange="BulkImportApp.handleSortChange(this.value)">
+                <option value="hsk-asc">HSK Level (1 → 6)</option>
+                <option value="hsk-desc">HSK Level (6 → 1)</option>
+                <option value="freq-desc">Most Frequent</option>
+                <option value="length-desc">Word Length</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Extracted Words List / Cards Grid -->
+          <div id="extracted-words-container" class="extracted-words-container">
+            <!-- Dynamic word cards go here -->
+          </div>
+
+          <!-- Bottom Action & Import Bar -->
+          <div class="bulk-action-footer">
+            <div class="import-actions-row">
+              <button type="button" id="btn-batch-translate" class="btn-block btn-secondary" onclick="BulkImportApp.translateSelected()">
+                🌐 Translate Vietnamese
+              </button>
+              <button type="button" id="btn-batch-add" class="btn-block btn-success" onclick="BulkImportApp.addSelectedToFlashcards()">
+                📥 Add Selected to Flashcards (<span id="btn-selected-count">0</span>)
+              </button>
+            </div>
+
+            <!-- Progress Indicator -->
+            <div id="progress-container">
+              <div id="progress-bar"></div>
+            </div>
+            <p id="bulk-status"></p>
+          </div>
+        </div>
       </div>
     </div>
 
+    <!-- 3. Cards List View -->
     <div id="view-list" class="hidden" style="width:100%">
       <h2>All Cards</h2>
       <div class="search-bar-container">
-        <input type="text" id="search-input" placeholder="Search Hanzi, Pinyin, or Meaning..." onkeyup="App.renderList()">
+        <input type="text" id="search-input" placeholder="Search Hanzi, Pinyin, Vietnamese, or HSK (e.g. hsk:2)..." onkeyup="App.renderList()">
       </div>
       <div id="card-list-container">
-        </div>
+      </div>
     </div>
 
+    <!-- 4. Settings / Dashboard View -->
     <div id="view-settings" class="hidden">
       <h2>Dashboard</h2>
       <div class="stats-row">
@@ -114,13 +246,19 @@
           <input type="file" class="file-upload-input" onchange="DataMgr.import(this)">
         </div>
       </div>
+      <div class="section-box">
+        <h3>HSK Dictionary Cache</h3>
+        <p style="font-size:0.85rem; color:#6b7280; margin-bottom:12px;">Manage local HSK 1-6 vocabulary cache (downloaded via JS in browser for offline word extraction).</p>
+        <button onclick="HSKManager.clearCacheAndReload()" class="btn-block btn-secondary">🔄 Refresh HSK Database</button>
+      </div>
       <div class="section-box" style="border: 1px solid #fee2e2;">
         <h3 style="color:var(--danger)">Danger Zone</h3>
-        <button onclick="DataMgr.clear()" class="btn-block btn-danger">🗑️ Delete All Data</button>
+        <button onclick="DataMgr.clear()" class="btn-block btn-danger">🗑️ Delete All Cards</button>
       </div>
     </div>
   </main>
 
+  <!-- Bottom Navigation Bar -->
   <nav>
     <button id="nav-review" onclick="App.setView('review')"><span>📝</span>Review</button>
     <button id="nav-list" onclick="App.setView('list')"><span>📚</span>Cards</button>
