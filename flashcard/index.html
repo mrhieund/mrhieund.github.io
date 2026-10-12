@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <title>Chinese Flashcards</title>
@@ -8,6 +9,7 @@
   <meta name="theme-color" content="#3b82f6">
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
   <!-- Toast Notification -->
@@ -41,6 +43,9 @@
             <option value="4">HSK 4</option>
             <option value="5">HSK 5</option>
             <option value="6">HSK 6</option>
+            <option value="7">HSK 7</option>
+            <option value="8">HSK 8</option>
+            <option value="9">HSK 9</option>
           </select>
         </div>
         <div class="modal-actions">
@@ -111,13 +116,15 @@
       <div id="add-panel-bulk" class="section-box bulk-box">
         <div class="bulk-header">
           <h2>Bulk Import & HSK Filter</h2>
-          <p class="bulk-subtitle">Paste a wall of Chinese text. We extract individual Chinese words, categorize them by HSK level, and add them directly to your flashcards.</p>
-          
+          <p class="bulk-subtitle">Paste a wall of Chinese text. We extract individual Chinese words, categorize them by
+            HSK level, and add them directly to your flashcards.</p>
+
           <!-- HSK DB Status Bar -->
           <div class="hsk-db-status" id="hsk-db-status">
             <span class="status-dot pulsing" id="hsk-status-dot"></span>
             <span id="hsk-status-text">Loading HSK Dictionary...</span>
-            <button type="button" class="btn-inline-sync" onclick="HSKManager.syncRemote()" title="Reload/Download HSK data">🔄 Sync</button>
+            <button type="button" class="btn-inline-sync" onclick="HSKManager.syncRemote()"
+              title="Reload/Download HSK data">🔄 Sync</button>
           </div>
         </div>
 
@@ -125,9 +132,10 @@
         <div class="bulk-input-area">
           <textarea id="bulk-text" rows="5" placeholder="Paste your wall of Chinese text here (articles, dialogue, news, transcript)...
 e.g. 今天天气很好，我和朋友一起去超市买水果。虽然有点累，但是我们都很开心。"></textarea>
-          
+
           <div class="bulk-quick-actions">
-            <button type="button" class="btn-text-link" onclick="BulkImportApp.loadSampleText()">📋 Load Sample Text</button>
+            <button type="button" class="btn-text-link" onclick="BulkImportApp.loadSampleText()">📋 Load Sample
+              Text</button>
             <button type="button" class="btn-text-link" onclick="BulkImportApp.clearInput()">🗑️ Clear</button>
           </div>
 
@@ -143,7 +151,8 @@ e.g. 今天天气很好，我和朋友一起去超市买水果。虽然有点累
             </label>
           </div>
 
-          <button onclick="BulkImportApp.extractWords()" id="btn-bulk-extract" class="btn-block btn-primary btn-extract">
+          <button onclick="BulkImportApp.extractWords()" id="btn-bulk-extract"
+            class="btn-block btn-primary btn-extract">
             ⚡ Extract & Arrange by HSK Level
           </button>
         </div>
@@ -181,8 +190,8 @@ e.g. 今天天气很好，我和朋友一起去超市买水果。虽然有点累
             <div class="tool-group sort-tools">
               <label for="sort-extracted">Sort:</label>
               <select id="sort-extracted" onchange="BulkImportApp.handleSortChange(this.value)">
-                <option value="hsk-asc">HSK Level (1 → 6)</option>
-                <option value="hsk-desc">HSK Level (6 → 1)</option>
+                <option value="hsk-asc">HSK Level (1 → 9)</option>
+                <option value="hsk-desc">HSK Level (9 → 1)</option>
                 <option value="freq-desc">Most Frequent</option>
                 <option value="length-desc">Word Length</option>
               </select>
@@ -197,10 +206,12 @@ e.g. 今天天气很好，我和朋友一起去超市买水果。虽然有点累
           <!-- Bottom Action & Import Bar -->
           <div class="bulk-action-footer">
             <div class="import-actions-row">
-              <button type="button" id="btn-batch-translate" class="btn-block btn-secondary" onclick="BulkImportApp.translateSelected()">
+              <button type="button" id="btn-batch-translate" class="btn-block btn-secondary"
+                onclick="BulkImportApp.translateSelected()">
                 🌐 Translate Vietnamese
               </button>
-              <button type="button" id="btn-batch-add" class="btn-block btn-success" onclick="BulkImportApp.addSelectedToFlashcards()">
+              <button type="button" id="btn-batch-add" class="btn-block btn-success"
+                onclick="BulkImportApp.addSelectedToFlashcards()">
                 📥 Add Selected to Flashcards (<span id="btn-selected-count">0</span>)
               </button>
             </div>
@@ -219,7 +230,8 @@ e.g. 今天天气很好，我和朋友一起去超市买水果。虽然有点累
     <div id="view-list" class="hidden" style="width:100%">
       <h2>All Cards</h2>
       <div class="search-bar-container">
-        <input type="text" id="search-input" placeholder="Search Hanzi, Pinyin, Vietnamese, or HSK (e.g. hsk:2)..." onkeyup="App.renderList()">
+        <input type="text" id="search-input" placeholder="Search Hanzi, Pinyin, Vietnamese, or HSK (e.g. hsk:2)..."
+          onkeyup="App.renderList()">
       </div>
       <div id="card-list-container">
       </div>
@@ -240,7 +252,8 @@ e.g. 今天天气很好，我和朋友一起去超市买水果。虽然有点累
       </div>
       <div class="section-box">
         <h3>Data Management</h3>
-        <button onclick="DataMgr.export()" class="btn-block btn-success" style="margin-bottom:10px;">⬇️ Download Backup</button>
+        <button onclick="DataMgr.export()" class="btn-block btn-success" style="margin-bottom:10px;">⬇️ Download
+          Backup</button>
         <div class="file-upload-wrapper">
           <button class="btn-block btn-secondary">⬆️ Restore Backup</button>
           <input type="file" class="file-upload-input" onchange="DataMgr.import(this)">
@@ -248,8 +261,10 @@ e.g. 今天天气很好，我和朋友一起去超市买水果。虽然有点累
       </div>
       <div class="section-box">
         <h3>HSK Dictionary Cache</h3>
-        <p style="font-size:0.85rem; color:#6b7280; margin-bottom:12px;">Manage local HSK 1-6 vocabulary cache (downloaded via JS in browser for offline word extraction).</p>
-        <button onclick="HSKManager.clearCacheAndReload()" class="btn-block btn-secondary">🔄 Refresh HSK Database</button>
+        <p style="font-size:0.85rem; color:#6b7280; margin-bottom:12px;">Manage local HSK 1-9 vocabulary cache
+          (downloaded via JS in browser for offline word extraction).</p>
+        <button onclick="HSKManager.clearCacheAndReload()" class="btn-block btn-secondary">🔄 Refresh HSK
+          Database</button>
       </div>
       <div class="section-box" style="border: 1px solid #fee2e2;">
         <h3 style="color:var(--danger)">Danger Zone</h3>
@@ -268,4 +283,5 @@ e.g. 今天天气很好，我和朋友一起去超市买水果。虽然有点累
 
   <script src="index.js"></script>
 </body>
+
 </html>

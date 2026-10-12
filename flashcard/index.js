@@ -42,7 +42,7 @@ const Utils = {
 };
 
 /** 2. DATABASE MODULE */
-const DB_KEY = 'srs_db_v3';
+const DB_KEY = 'srs_db_v4';
 const DB = {
   getAll: () => {
     try {
@@ -190,7 +190,7 @@ const Translator = {
 
 /** 5. HSK VOCABULARY MANAGER & SEGMENTATION ENGINE */
 const HSKManager = {
-  dict: {}, // Key: Chinese word -> { lvl: 1-6, pinyin: string, def: string }
+  dict: {}, // Key: Chinese word -> { lvl: 1-7, pinyin: string, def: string }
   isLoaded: false,
   isLoading: false,
 
@@ -507,7 +507,7 @@ const HSKManager = {
       if (!window.indexedDB) {
         return resolve(null);
       }
-      const req = indexedDB.open('ChineseFlashcardDB', 1);
+      const req = indexedDB.open('ChineseFlashcardDB', 2);
       req.onupgradeneeded = (e) => {
         const db = e.target.result;
         if (!db.objectStoreNames.contains('hsk_data')) {
@@ -526,7 +526,7 @@ const HSKManager = {
       return new Promise((resolve) => {
         const tx = db.transaction('hsk_data', 'readonly');
         const store = tx.objectStore('hsk_data');
-        const req = store.get('full_dict');
+        const req = store.get('full_dict_3');
         req.onsuccess = () => resolve(req.result || null);
         req.onerror = () => resolve(null);
       });
@@ -542,7 +542,7 @@ const HSKManager = {
       return new Promise((resolve) => {
         const tx = db.transaction('hsk_data', 'readwrite');
         const store = tx.objectStore('hsk_data');
-        store.put(dictData, 'full_dict');
+        store.put(dictData, 'full_dict_3');
         tx.oncomplete = () => resolve(true);
         tx.onerror = () => resolve(false);
       });
@@ -563,7 +563,7 @@ const HSKManager = {
     if (cached && Object.keys(cached).length >= 1000) {
       Object.assign(HSKManager.dict, cached);
       HSKManager.isLoaded = true;
-      HSKManager.updateStatus(`✓ HSK 1–6 Ready (${Object.keys(HSKManager.dict).length.toLocaleString()} words)`, 'online');
+      HSKManager.updateStatus(`✓ HSK 1–7 Ready (${Object.keys(HSKManager.dict).length.toLocaleString()} words)`, 'online');
       return;
     }
 
@@ -578,11 +578,11 @@ const HSKManager = {
     HSKManager.updateStatus('Downloading HSK vocab via JS...', 'pulsing');
 
     let totalLoaded = 0;
-    const cdnBase = 'https://cdn.jsdelivr.net/gh/drkameleon/complete-hsk-vocabulary@main/wordlists/exclusive/old/';
-    const rawBase = 'https://raw.githubusercontent.com/drkameleon/complete-hsk-vocabulary/main/wordlists/exclusive/old/';
+    const cdnBase = 'https://cdn.jsdelivr.net/gh/drkameleon/complete-hsk-vocabulary@main/wordlists/exclusive/new/';
+    const rawBase = 'https://raw.githubusercontent.com/drkameleon/complete-hsk-vocabulary/main/wordlists/exclusive/new/';
 
-    for (let lvl = 1; lvl <= 6; lvl++) {
-      HSKManager.updateStatus(`Downloading HSK Level ${lvl}/6...`, 'pulsing');
+    for (let lvl = 1; lvl <= 7; lvl++) {
+      HSKManager.updateStatus(`Downloading HSK Level ${lvl}/7...`, 'pulsing');
       try {
         let res = null;
         try {
@@ -618,7 +618,7 @@ const HSKManager = {
     if (wordCount > 500) {
       HSKManager.isLoaded = true;
       await HSKManager.saveToStorage(HSKManager.dict);
-      HSKManager.updateStatus(`✓ HSK 1–6 Ready (${wordCount.toLocaleString()} words)`, 'online');
+      HSKManager.updateStatus(`✓ HSK 1–7 Ready (${wordCount.toLocaleString()} words)`, 'online');
     } else {
       HSKManager.updateStatus(`● Basic HSK Ready (${wordCount} words)`, 'online');
     }
@@ -805,6 +805,7 @@ const BulkImportApp = {
       { id: '4', label: 'HSK 4', count: counts[4], colorClass: 'hsk-4' },
       { id: '5', label: 'HSK 5', count: counts[5], colorClass: 'hsk-5' },
       { id: '6', label: 'HSK 6', count: counts[6], colorClass: 'hsk-6' },
+      { id: '7', label: 'HSK 7', count: counts[7], colorClass: 'hsk-7' },
       { id: '0', label: 'Other', count: counts[0], colorClass: 'hsk-0' }
     ];
 
